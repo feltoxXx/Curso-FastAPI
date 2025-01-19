@@ -49,6 +49,16 @@ async def create_customer(customer_data: CustomerCreate):
 async def list_customer():
     return db_customers
 
+@app.get("/customer/{id}")
+async def get_customer(id: int):
+    if len(db_customers) == 0:
+        return {"error": "No customers found in the database"}
+    
+    if id < 0 or id >= len(db_customers):
+        return {"error": "Customer not found"}
+        
+    return db_customers[id]
+    
 
 @app.post("/transactions")
 async def create_transaction(transaction_data: Transaction):
