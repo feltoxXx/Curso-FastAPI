@@ -1,0 +1,73 @@
+# Byte-compiled / optimized / compiled Python files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Cython debug symbols
+*.pyd
+*.so
+*.dll
+
+# Logs and debug files
+*.log
+*.out
+*.err
+
+# Environment variables
+.env
+.env.*
+
+# Virtual environments
+venv/
+env/
+.virtualenv/
+
+# FastAPI related
+*.db
+*.sqlite3
+
+# Cache files
+*.cache
+*.pytest_cache/
+.cache/
+*.mypy_cache/
+mypy_cache/
+
+# Coverage reports
+coverage.xml
+.coverage
+htmlcov/
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints
+
+# IDE files
+.vscode/
+.idea/
+*.sublime-workspace
+*.sublime-project
+
+# OS-specific files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Python egg metadata
+*.egg-info/
+.installed.cfg
+*.egg
+.eggs/
+
+# Build artifacts
+build/
+dist/
+*.egg-info/
+pip-wheel-metadata/
+*.manifest
+
+# Test results
+.junit_cache/
+
+# Temporary files
+*.tmp
+*.temp
