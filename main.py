@@ -2,7 +2,9 @@ from datetime import datetime
 import zoneinfo
 
 from fastapi import FastAPI
+
 from models import Customer, CustomerCreate, Transaction, Invoice
+from db import get_session, SessionDependency
 
 app = FastAPI()
 
@@ -36,7 +38,7 @@ async def get_time(iso_code: str):
 db_customers: list[Customer] = []
 
 @app.post("/customers", response_model=Customer)
-async def create_customer(customer_data: CustomerCreate):
+async def create_customer(customer_data: CustomerCreate, session: SessionDependency):
     customer = Customer.model_validate(customer_data.model_dump())
 
     # This is just an example, in a real application this should be done in the database
