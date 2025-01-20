@@ -2,10 +2,8 @@ from datetime import datetime
 import zoneinfo
 
 from fastapi import FastAPI
-from sqlmodel import select
 
-from models import Transaction, Invoice
-from db import SessionDependency, create_db_and_tables
+from db import create_db_and_tables
 from .routers import customers, transactions, invoices
 
 app = FastAPI(lifespan=create_db_and_tables)
