@@ -4,7 +4,7 @@ import zoneinfo
 from fastapi import FastAPI, HTTPException, status
 from sqlmodel import select
 
-from models import Customer, CustomerCreate, Transaction, Invoice
+from models import Customer, CustomerCreate, CustomerUpdate, Transaction, Invoice
 from db import SessionDependency, create_db_and_tables
 
 app = FastAPI(lifespan=create_db_and_tables)
@@ -81,8 +81,8 @@ async def delete_customer(id: int, session: SessionDependency):
     return {"message": "Customer deleted"}
 
 
-@app.put("/customers/{id}", response_model=Customer)
-async def update_customer(id: int, customer_data: CustomerCreate, session: SessionDependency):
+@app.patch("/customers/{id}", response_model=Customer)
+async def update_customer(id: int, customer_data: CustomerUpdate, session: SessionDependency):
     customer = session.get(Customer, id)
     if not customer:
         raise HTTPException(status_code=404, detail="Customer not found")
@@ -93,7 +93,7 @@ async def update_customer(id: int, customer_data: CustomerCreate, session: Sessi
     session.add(customer)
     session.commit()
     session.refresh(customer)
-    
+
     return customer
 
 
