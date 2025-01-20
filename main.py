@@ -2,11 +2,12 @@ from datetime import datetime
 import zoneinfo
 
 from fastapi import FastAPI
+from sqlmodel import select
 
 from models import Customer, CustomerCreate, Transaction, Invoice
-from db import get_session, SessionDependency
+from db import SessionDependency, create_db_and_tables
 
-app = FastAPI()
+app = FastAPI(lifespan=create_db_and_tables)
 
 country_timezones = {
     "US": "America/New_York",
@@ -27,6 +28,7 @@ country_timezones = {
 async def root():
     return {"message": "Hello World"}
 
+
 @app.get("/time/{iso_code}")
 async def get_time(iso_code: str):
     if iso_code.upper() not in country_timezones:
@@ -35,36 +37,39 @@ async def get_time(iso_code: str):
     tz = zoneinfo.ZoneInfo(timezone_str)
     return {"time": datetime.now(tz)}
 
-db_customers: list[Customer] = []
+
 
 @app.post("/customers", response_model=Customer)
 async def create_customer(customer_data: CustomerCreate, session: SessionDependency):
     customer = Customer.model_validate(customer_data.model_dump())
 
-    # This is just an example, in a real application this should be done in the database
-    customer.id = len(db_customers)
-    db_customers.append(customer)
+    session.add(customer)
+    session.commit()
+    session.refresh(customer)
 
     return customer
 
+
 @app.get("/customers", response_model=list[Customer])
-async def list_customer():
-    return db_customers
+async def list_customer(session: SessionDependency):
+    return session.exec(select(Customer)).all()
+    
+
 
 @app.get("/customer/{id}")
-async def get_customer(id: int):
-    if len(db_customers) == 0:
-        return {"error": "No customers found in the database"}
-    
-    if id < 0 or id >= len(db_customers):
+async def get_customer(id: int, session: SessionDependency):
+    customer = session.exec(select(Customer).where(Customer.id == id)).first()
+    if not customer:
         return {"error": "Customer not found"}
         
-    return db_customers[id]
+    return customer
     
+
 
 @app.post("/transactions")
 async def create_transaction(transaction_data: Transaction):
     return transaction_data
+
 
 @app.post("/invoices")
 async def create_invoice(invoice_data: Invoice):
