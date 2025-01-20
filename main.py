@@ -38,6 +38,10 @@ async def get_time(iso_code: str):
     return {"time": datetime.now(tz)}
 
 
+@app.get("/customers", response_model=list[Customer])
+async def get_customers(session: SessionDependency):
+    return session.exec(select(Customer)).all()
+
 
 @app.post("/customers", response_model=Customer)
 async def create_customer(customer_data: CustomerCreate, session: SessionDependency):
@@ -47,17 +51,11 @@ async def create_customer(customer_data: CustomerCreate, session: SessionDepende
     session.commit()
     session.refresh(customer)
 
-    return customer
-
-
-@app.get("/customers", response_model=list[Customer])
-async def list_customer(session: SessionDependency):
-    return session.exec(select(Customer)).all()
-    
+    return customer  
 
 
 @app.get("/customers/{id}", response_model=Customer)
-async def get_customer(id: int, session: SessionDependency):
+async def read_customer(id: int, session: SessionDependency):
 
     customer = session.get(Customer, id) # Esto retorna el mismo resultado que el siguiente
     # customer = session.exec(select(Customer).where(Customer.id == id)).first()
@@ -81,7 +79,7 @@ async def delete_customer(id: int, session: SessionDependency):
     return {"message": "Customer deleted"}
 
 
-@app.patch("/customers/{id}", response_model=Customer)
+@app.patch("/customers/{id}", response_model=Customer, status_code=status.HTTP_201_CREATED)
 async def update_customer(id: int, customer_data: CustomerUpdate, session: SessionDependency):
     customer = session.get(Customer, id)
     if not customer:
